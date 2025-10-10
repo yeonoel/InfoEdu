@@ -1,0 +1,82 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+
+model User {
+  id        Int         @id @default(autoincrement())
+  name      String?     @db.VarChar(100)
+  email     String      @unique @db.VarChar(150)
+  password  String      @db.VarChar(255)
+  role      String      @default("student") @db.VarChar(50)
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+  subscriptions Subscription[]
+}
+
+model School {
+  id          Int       @id @default(autoincrement())
+  name        String    @db.VarChar(150)
+  description String?
+  location    String?   @db.VarChar(150)
+  logo        String?
+  createdAt   DateTime  @default(now())
+  updatedAt DateTime    @updatedAt
+  answers     Answer[]
+}
+
+model Category {
+  id          Int        @id @default(autoincrement())
+  name        String     @db.VarChar(100)
+  description String?    @db.Text
+  createdAt   DateTime   @default(now())
+  updatedAt DateTime    @updatedAt
+  questions   Question[]
+}
+
+model Question {
+  id         Int      @id @default(autoincrement())
+  label      String   @db.Text
+  categoryId Int
+  createdAt  DateTime @default(now())
+  updatedAt DateTime    @updatedAt
+  category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  answers    Answer[]
+}
+
+model Answer {
+  id         Int      @id @default(autoincrement())
+  school     School   @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  schoolId   Int
+  question   Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  questionId Int
+  content    String
+  createdAt   DateTime  @default(now())
+  updatedAt DateTime    @updatedAt
+
+  @@unique([schoolId, questionId])
+}
+
+model Subscription {
+  id        Int      @id @default(autoincrement())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    Int
+  type      String?  @db.VarChar(50) // ex: "monthly", "yearly"
+  startDate DateTime @default(now())
+  endDate   DateTime?
+  status    String   @default("active") @db.VarChar(20)
+  createdAt   DateTime  @default(now())
+  updatedAt DateTime    @updatedAt
+
+}
