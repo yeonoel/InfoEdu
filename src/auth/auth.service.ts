@@ -9,7 +9,7 @@ import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { ResetPasswordDemandDto } from './dto/resetPasswordDemanDto';
 import { ResetPasswordConfirmation } from './dto/resetPasswordConfirmation';
-import { IsBase32 } from 'class-validator';
+import { deleteAccountDto } from './dto/deleteAccountDto';
 
 @Injectable()
 export class AuthService {
@@ -93,6 +93,7 @@ export class AuthService {
             step: 60 * 15,
             encoding: 'base32'
         });
+        
         if(!match) throw new UnauthorizedException('Invalide/token expiré');
         const hash = await bcrypt.hash(password, 10);
         await this.prismaService.user.update({ where: {email}, data: {password: hash}});
@@ -100,5 +101,16 @@ export class AuthService {
         return {
             user
         }
+    }
+
+    async deleteAccount(id: number, deleteAccountDto: deleteAccountDto) {
+        const {password} = deleteAccountDto;
+        const user = await this.prismaService.user.findUnique({where: {id}});
+        if(!user) throw new NotFoundException("Utilisateur non trouvé");
+        // ** comparer le mot de passe
+        const match = await bcrypt.compare(password, user.password);
+        if(!match) new UnauthorizedException("Le mot de passe ne correspond pas");
+        await this.prismaService.user.delete({where: {id}});
+        return {data: "Utilisateur supprimé avec succès"}
     }
 }

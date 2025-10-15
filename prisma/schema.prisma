@@ -15,68 +15,109 @@ datasource db {
 
 
 model User {
-  id        Int         @id @default(autoincrement())
-  name      String?     @db.VarChar(100)
-  email     String      @unique @db.VarChar(150)
-  password  String      @db.VarChar(255)
-  role      String      @default("student") @db.VarChar(50)
-  createdAt DateTime    @default(now())
-  updatedAt DateTime    @updatedAt
-  subscriptions Subscription[]
+  id        Int      @id @default(autoincrement())
+  name      String?
+  email     String   @unique
+  password  String
+  role      String   @default("student")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  reviews   Review[]
 }
 
 model School {
-  id          Int       @id @default(autoincrement())
-  name        String    @db.VarChar(150)
-  description String?
-  location    String?   @db.VarChar(150)
-  logo        String?
-  createdAt   DateTime  @default(now())
-  updatedAt DateTime    @updatedAt
-  answers     Answer[]
+  id           Int       @id @default(autoincrement())
+  name         String
+  type         String?     // privée / publique / semi-publique
+  commune      String?     // Cocody, Yopougon, etc.
+  stateSupport String?     // Oui / Non / Je ne sais pas
+  priceLevel   String?     // Abordable / Moyenne / Trop chère
+  logo         String?
+  longitude    String?
+  latitude     String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  filieres     Filiere[]
+  reviews      Review[]
 }
 
-model Category {
-  id          Int        @id @default(autoincrement())
-  name        String     @db.VarChar(100)
-  description String?    @db.Text
-  createdAt   DateTime   @default(now())
-  updatedAt DateTime    @updatedAt
-  questions   Question[]
-}
-
-model Question {
-  id         Int      @id @default(autoincrement())
-  label      String   @db.Text
-  categoryId Int
-  createdAt  DateTime @default(now())
-  updatedAt DateTime    @updatedAt
-  category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
-  answers    Answer[]
-}
-
-model Answer {
-  id         Int      @id @default(autoincrement())
-  school     School   @relation(fields: [schoolId], references: [id], onDelete: Cascade)
-  schoolId   Int
-  question   Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
-  questionId Int
-  content    String
-  createdAt   DateTime  @default(now())
-  updatedAt DateTime    @updatedAt
-
-  @@unique([schoolId, questionId])
-}
-
-model Subscription {
+model Filiere {
   id        Int      @id @default(autoincrement())
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId    Int
-  type      String?  @db.VarChar(50) // ex: "monthly", "yearly"
-  startDate DateTime @default(now())
-  endDate   DateTime?
-  status    String   @default("active") @db.VarChar(20)
-  createdAt   DateTime  @default(now())
-  updatedAt DateTime    @updatedAt
+  name      String   // Exemple : Informatique, Management
+  school    School   @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  schoolId  Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
 
+model Review {
+  id        Int       @id @default(autoincrement())
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    Int
+  school    School    @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  schoolId  Int
+  comment   String?   @db.Text
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  scores    ReviewScore[]
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+model Criteria {
+  id        Int       @id @default(autoincrement())
+  label     String    // Exemple : "Cours théoriques", "Cours pratiques", "Cadre étudiant", "Frais"
+  icon      String?   // optionnel pour UI
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  scores    ReviewScore[]
+}
+
+model ReviewScore {
+  id          Int       @id @default(autoincrement())
+  review      Review    @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+  reviewId    Int
+  criteria    Criteria  @relation(fields: [criteriaId], references: [id], onDelete: Cascade)
+  criteriaId  Int
+  value       String    // "Très bien" / "Bien" / "Moyen" / "Mauvais"
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@unique([reviewId, criteriaId])
 }
