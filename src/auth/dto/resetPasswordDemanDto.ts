@@ -1,6 +1,6 @@
-import { IsEmail, IsNotEmpty} from 'class-validator';
+import { IsEmail, IsNotEmpty } from "class-validator";
 
 export class ResetPasswordDemandDto {
-    @IsEmail()
-    readonly email: string;
+  @IsEmail()
+  readonly email: string;
 }

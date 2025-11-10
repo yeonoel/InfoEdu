@@ -63,43 +63,6 @@ model Review {
 }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 model Criteria {
   id        Int       @id @default(autoincrement())
   label     String    // Exemple : "Cours théoriques", "Cours pratiques", "Cadre étudiant", "Frais"

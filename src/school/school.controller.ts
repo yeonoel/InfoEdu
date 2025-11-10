@@ -1,31 +1,35 @@
-import { Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common';
-import { SchoolService } from './school.service';
-import { CreateSchoolDto } from './Dto/CreateSchoolDto';
+import { Body, Controller, Delete, Get, Param, Post } from "@nestjs/common";
+import { SchoolService } from "./school.service";
+import { CreateSchoolDto } from "./Dto/CreateSchoolDto";
 
-@Controller('school')
+@Controller("school")
 export class SchoolController {
-    constructor(
-        private readonly schoolService: SchoolService
-    ) {}
+  constructor(private readonly schoolService: SchoolService) {}
 
-    @Post('new-university')
-    create(@Body() createSchoolDto: CreateSchoolDto ) {
-            return this.schoolService.create(createSchoolDto);
-    }
+  @Post("new-university")
+  create(@Body() createSchoolDto: CreateSchoolDto[]) {
+    return this.schoolService.createMany(createSchoolDto);
+  }
 
-    @Get('all-university')
-    findAll() {
-        return this.schoolService.findAll();
-    }
+  
 
-    @Delete('delete-universite/:id')
-    remove(@Param('id') id: number) {
-        return this.schoolService.remove(+id);
-    }
+  @Get("all-university")
+  findAll() {
+    return this.schoolService.findAll();
+  }
 
-    @Put('update-universite/:id')
-    update(@Param('id') id: number, @Body() updateSchoolDto: CreateSchoolDto) {
-        return this.schoolService.update(+id, updateSchoolDto);
-    }
+  @Get("detail-university/:id")
+  getOne(@Param("id") id: number) {
+    return this.schoolService.getOne(+id);
+  }
 
+  @Delete("delete-universite/:id")
+  remove(@Param("id") id: number) {
+    return this.schoolService.remove(+id);
+  }
+
+  /* @Put("update-universite/:id")
+  update(@Param("id") id: number, @Body() updateSchoolDto: CreateSchoolDto) {
+    return this.schoolService.update(+id, updateSchoolDto);
+  } */
 }

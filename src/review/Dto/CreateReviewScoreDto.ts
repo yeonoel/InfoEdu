@@ -1,12 +1,9 @@
-import { IsIn, IsInt } from "class-validator";
-
+import { IsIn, IsInt, IsString } from "class-validator";
 
 export class CreateReviewScoreDto {
-    @IsInt()
-    criteriaId: number; // ID du critère (ex: Cours théoriques, Cadre étudiant)
+  @IsInt()
+  criteriaId: number; // ID du critère (ex: Cours théoriques, Cadre étudiant)
 
-    @IsInt()
-    value: String; // "Très bien" / "Bien" / "Moyen" / "Mauvais"
-
+  @IsString()
+  value: string; // "Très bien" / "Bien" / "Moyen" / "Mauvais"
 }
-

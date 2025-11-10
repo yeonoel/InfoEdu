@@ -1,44 +1,43 @@
-import { IsString, IsOptional, IsArray, ValidateNested } from 'class-validator'
-import { Type } from 'class-transformer'
-import { CreateFiliereDto } from './CreateFiliereDto'
-
+import { IsString, IsOptional, IsArray, ValidateNested } from "class-validator";
+import { Type } from "class-transformer";
+import { CreateFiliereDto } from "./CreateFiliereDto";
 
 export class CreateSchoolDto {
   @IsString()
-  name: string
+  name: string;
 
   @IsOptional()
   @IsString()
-  type?: string
+  type?: string;
 
   @IsOptional()
   @IsString()
-  commune?: string
+  commune?: string;
 
   @IsOptional()
   @IsString()
-  stateSupport?: string
+  stateSupport?: string;
 
   @IsOptional()
   @IsString()
-  priceLevel?: string
+  priceLevel?: string;
 
   @IsOptional()
   @IsString()
-  logo?: string
+  logo?: string;
 
   @IsOptional()
   @IsString()
-  longitude?: string
+  longitude?: string;
 
   @IsOptional()
   @IsString()
-  latitude?: string
+  latitude?: string;
 
   // ✅ Relation : création de filières en même temps
   @IsOptional()
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => CreateFiliereDto)
-  filieres?: CreateFiliereDto[]
+  filieres?: CreateFiliereDto[];
 }
