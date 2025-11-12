@@ -29,7 +29,7 @@ export class AuthService {
     // ** verifier si l'utilisateur existe déja
     const { email, password, username, role } = signupDto;
     const user = await this.prismaService.users.findUnique({ where: { email } });
-    if (user) throw new ConflictException("User alredy existe");
+    if (user) throw new ConflictException("Un utilisateur avec cet email existe déjà.");
     // ** hasher le mot de passe
     const hash = await bcrypt.hash(password, 10);
     // Enregistrer l'utilisateru dans la base de donnée
