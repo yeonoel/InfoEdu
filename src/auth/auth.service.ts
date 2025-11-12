@@ -41,7 +41,7 @@ export class AuthService {
     //this.maillerService.sendSignupConfirmation(email);
     return { 
       status: "success",
-      message :"User succesfuly created",
+      message :"Utilisateur crée avec succès",
       data: newUser
     }
 
@@ -56,10 +56,10 @@ export class AuthService {
         { username: emailOrUsername },
       ]
      } });
-    if (!user) throw new NotFoundException("user not found");
+    if (!user) throw new NotFoundException("utilisateur non trouvé");
     // ** Comparer les mots de passe
     const match = await bcrypt.compare(password, user.password);
-    if (!match) throw new UnauthorizedException("Password does not existe");
+    if (!match) throw new UnauthorizedException("Mot de passe incorrect");
     // ** retourner le token jwt
     const payload = {
       sub: user.id,
@@ -74,6 +74,7 @@ export class AuthService {
       status: "success",
       token,
       user: {
+        id: user.id,
         username: user.username,
         email: user.email,
       },
@@ -84,7 +85,7 @@ export class AuthService {
     const { email } = resetPasswordDemandDto;
     // ** Vérifier si l'utilisateur existe
     const user = await this.prismaService.users.findUnique({ where: { email } });
-    if (!user) throw new NotFoundException("user not found");
+    if (!user) throw new NotFoundException("utilisateur non trouvé");
     // ** code a envoyer par mail au client pour la réinitialisation
     const code = speakeasy.totp({
       secret: this.configService.get("OTP_CODE"),
@@ -105,7 +106,7 @@ export class AuthService {
     const { email, password, code } = resetPasswordConfirmation;
     // ** Vérifier si l'utilisateur existe
     const user = await this.prismaService.users.findUnique({ where: { email } });
-    if (!user) throw new NotFoundException("user not found");
+    if (!user) throw new NotFoundException("utilisateur non trouvé");
     const match = speakeasy.totp.verify({
       secret: this.configService.get("OTP_CODE"),
       token: code,
