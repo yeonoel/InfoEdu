@@ -11,7 +11,7 @@ export class SchoolService {
     return this.prismaService.$transaction(
       createSchoolDto.map((school) => {
         const { filieres, ...schoolData } = school;
-        return this.prismaService.school.create({
+        return this.prismaService.schools.create({
           data: {
             ...schoolData,
             filieres: {
@@ -24,12 +24,13 @@ export class SchoolService {
   }
 
   async findAll() {
-    return this.prismaService.school.findMany({
+    return this.prismaService.schools.findMany({
       include: {
         filieres: true,
         reviews: {
           include: {
-            scores: {
+            user: {select: {username: true}},
+            reviewScores: {
               include: {
                 criteria: true,
               },
@@ -41,7 +42,7 @@ export class SchoolService {
   }
 
   async getOne(id: number){
-    const school = await this.prismaService.school.findUnique({
+    const school = await this.prismaService.schools.findUnique({
       where: { id },
       include: {
         filieres: true,
@@ -57,7 +58,7 @@ export class SchoolService {
   }
 
   async remove(id: number) {
-    await this.prismaService.school.delete({
+    await this.prismaService.schools.delete({
       where: { id },
     });
     return { message: "Université supprimée avec succès" };

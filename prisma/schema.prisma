@@ -13,74 +13,72 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-
-model User {
-  id        Int      @id @default(autoincrement())
-  name      String?
-  email     String   @unique
+model Users {
+  id        Int       @id @default(autoincrement())
+  username  String?
+  email     String    @unique
   password  String
-  role      String   @default("student")
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  reviews   Review[]
+  role      String    @default("student")
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  reviews   Reviews[]
 }
 
-model School {
-  id           Int       @id @default(autoincrement())
+model Schools {
+  id           Int        @id @default(autoincrement())
   name         String
-  type         String?     // privée / publique / semi-publique
-  commune      String?     // Cocody, Yopougon, etc.
-  stateSupport String?     // Oui / Non / Je ne sais pas
-  priceLevel   String?     // Abordable / Moyenne / Trop chère
+  type         String? // privée / publique / semi-publique
+  commune      String? // Cocody, Yopougon, etc.
+  stateSupport String? // Oui / Non / Je ne sais pas
+  priceLevel   String? // Abordable / Moyenne / Trop chère
   logo         String?
   longitude    String?
   latitude     String?
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-  filieres     Filiere[]
-  reviews      Review[]
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  filieres     Filieres[]
+  reviews      Reviews[]
 }
 
-model Filiere {
+model Filieres {
   id        Int      @id @default(autoincrement())
-  name      String   // Exemple : Informatique, Management
-  school    School   @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  name      String // Exemple : Informatique, Management
+  school    Schools  @relation(fields: [schoolId], references: [id], onDelete: Cascade)
   schoolId  Int
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
-model Review {
-  id        Int       @id @default(autoincrement())
-  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId    Int
-  school    School    @relation(fields: [schoolId], references: [id], onDelete: Cascade)
-  schoolId  Int
-  comment   String?   @db.Text
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  scores    ReviewScore[]
+model Reviews {
+  id           Int            @id @default(autoincrement())
+  user         Users          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId       Int
+  school       Schools        @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  schoolId     Int
+  comment      String?        @db.Text
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  reviewScores ReviewScores[]
 }
 
-
-model Criteria {
-  id        Int       @id @default(autoincrement())
-  label     String    // Exemple : "Cours théoriques", "Cours pratiques", "Cadre étudiant", "Frais"
-  icon      String?   // optionnel pour UI
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  scores    ReviewScore[]
+model Criterias {
+  id           Int            @id @default(autoincrement())
+  label        String // Exemple : "Cours théoriques", "Cours pratiques", "Cadre étudiant", "Frais"
+  icon         String? // optionnel pour UI
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  reviewScores ReviewScores[]
 }
 
-model ReviewScore {
-  id          Int       @id @default(autoincrement())
-  review      Review    @relation(fields: [reviewId], references: [id], onDelete: Cascade)
-  reviewId    Int
-  criteria    Criteria  @relation(fields: [criteriaId], references: [id], onDelete: Cascade)
-  criteriaId  Int
-  value       String    // "Très bien" / "Bien" / "Moyen" / "Mauvais"
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+model ReviewScores {
+  id         Int       @id @default(autoincrement())
+  review     Reviews   @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+  reviewId   Int
+  criteria   Criterias @relation(fields: [criteriaId], references: [id], onDelete: Cascade)
+  criteriaId Int
+  value      String // "Très bien" / "Bien" / "Moyen" / "Mauvais"
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
 
   @@unique([reviewId, criteriaId])
 }

@@ -9,20 +9,20 @@ export class ReviewService {
 
   async create(createReviewDto: CreateReviewDto) {
     const { comment, schoolId, userId, scores } = createReviewDto;
-    const user = await this.prismaService.user.findUnique({
+    const user = await this.prismaService.users.findUnique({
       where: { id: userId },
     });
     if (!user) throw new NotFoundException("User not found");
-    const school = await this.prismaService.school.findUnique({
+    const school = await this.prismaService.schools.findUnique({
       where: { id: schoolId },
     });
     if (!school) throw new NotFoundException("School not found");
-    const review = await this.prismaService.review.create({
+    const review = await this.prismaService.reviews.create({
       data: {
         comment,
         schoolId,
         userId,
-        scores: {
+        reviewScores: {
           create:
             scores?.map((score) => ({
               criteriaId: score.criteriaId,
@@ -30,7 +30,7 @@ export class ReviewService {
             })) || [],
         },
       },
-      include: { scores: true },
+      include: { reviewScores: true },
     });
     return review;
   }

@@ -27,24 +27,35 @@ export class AuthService {
 
   async signup(signupDto: SignupDto) {
     // ** verifier si l'utilisateur existe déja
-    const { email, password, name, role } = signupDto;
-    const user = await this.prismaService.user.findUnique({ where: { email } });
+    const { email, password, username, role } = signupDto;
+    const user = await this.prismaService.users.findUnique({ where: { email } });
     if (user) throw new ConflictException("User alredy existe");
     // ** hasher le mot de passe
     const hash = await bcrypt.hash(password, 10);
     // Enregistrer l'utilisateru dans la base de donnée
-    await this.prismaService.user.create({
-      data: { name, email, password: hash, role },
+    const newUser = await this.prismaService.users.create({
+      data: { username, email, password: hash, role },
+      select: { id: true, username: true, email: true, role: true },
     });
     //** Envoi du mail d'inscription au client
-    this.maillerService.sendSignupConfirmation(email);
-    return { date: "User succesfuly created" };
+    //this.maillerService.sendSignupConfirmation(email);
+    return { 
+      status: "success",
+      message :"User succesfuly created",
+      data: newUser
+    }
+
   }
 
   async signin(signinDto: SigninDto) {
-    const { email, password } = signinDto;
+    const { emailOrUsername, password } = signinDto;
     // ** Vérifier si l'utilisateur existe
-    const user = await this.prismaService.user.findUnique({ where: { email } });
+    const user = await this.prismaService.users.findFirst({ where: { 
+      OR: [
+        { email: emailOrUsername },
+        { username: emailOrUsername },
+      ]
+     } });
     if (!user) throw new NotFoundException("user not found");
     // ** Comparer les mots de passe
     const match = await bcrypt.compare(password, user.password);
@@ -60,9 +71,10 @@ export class AuthService {
     });
 
     return {
+      status: "success",
       token,
       user: {
-        name: user.name,
+        username: user.username,
         email: user.email,
       },
     };
@@ -71,7 +83,7 @@ export class AuthService {
   async resetPassword(resetPasswordDemandDto: ResetPasswordDemandDto) {
     const { email } = resetPasswordDemandDto;
     // ** Vérifier si l'utilisateur existe
-    const user = await this.prismaService.user.findUnique({ where: { email } });
+    const user = await this.prismaService.users.findUnique({ where: { email } });
     if (!user) throw new NotFoundException("user not found");
     // ** code a envoyer par mail au client pour la réinitialisation
     const code = speakeasy.totp({
@@ -92,7 +104,7 @@ export class AuthService {
   ) {
     const { email, password, code } = resetPasswordConfirmation;
     // ** Vérifier si l'utilisateur existe
-    const user = await this.prismaService.user.findUnique({ where: { email } });
+    const user = await this.prismaService.users.findUnique({ where: { email } });
     if (!user) throw new NotFoundException("user not found");
     const match = speakeasy.totp.verify({
       secret: this.configService.get("OTP_CODE"),
@@ -104,7 +116,7 @@ export class AuthService {
 
     if (!match) throw new UnauthorizedException("Invalide/token expiré");
     const hash = await bcrypt.hash(password, 10);
-    await this.prismaService.user.update({
+    await this.prismaService.users.update({
       where: { email },
       data: { password: hash },
     });
@@ -116,12 +128,12 @@ export class AuthService {
 
   async deleteAccount(id: number, deleteAccountDto: deleteAccountDto) {
     const { password } = deleteAccountDto;
-    const user = await this.prismaService.user.findUnique({ where: { id } });
+    const user = await this.prismaService.users.findUnique({ where: { id } });
     if (!user) throw new NotFoundException("Utilisateur non trouvé");
     // ** comparer le mot de passe
     const match = await bcrypt.compare(password, user.password);
     if (!match) new UnauthorizedException("Le mot de passe ne correspond pas");
-    await this.prismaService.user.delete({ where: { id } });
+    await this.prismaService.users.delete({ where: { id } });
     return { data: "Utilisateur supprimé avec succès" };
   }
 }

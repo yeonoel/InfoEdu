@@ -7,7 +7,7 @@ export class CriteriaService {
   constructor(private readonly prismaService: PrismaService) {}
 
   async create(createCriteriaDto: CreateCriteriaDto) {
-    await this.prismaService.criteria.create({
+    await this.prismaService.criterias.create({
       data: { ...createCriteriaDto },
     });
     return { message: "Critère ajouté avec succès" };

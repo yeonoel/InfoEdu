@@ -2,7 +2,7 @@ import { IsString, IsEmail, IsNotEmpty } from "class-validator";
 
 export class SignupDto {
   @IsNotEmpty()
-  readonly name: string;
+  readonly username: string;
   @IsNotEmpty()
   @IsEmail()
   readonly email: string;
