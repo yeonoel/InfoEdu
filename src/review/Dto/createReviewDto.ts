@@ -21,5 +21,5 @@ export class CreateReviewDto {
   userId: number; // ID de l'utilisateur qui fait l'évaluation
 
   @IsArray()
-  scores: CreateReviewScoreDto[]; // Liste des scores pour chaque critère
+  reviewScores: CreateReviewScoreDto[]; // Liste des scores pour chaque critère
 }

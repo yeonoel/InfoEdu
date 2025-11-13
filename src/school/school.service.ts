@@ -46,7 +46,16 @@ export class SchoolService {
       where: { id },
       include: {
         filieres: true,
-        reviews: true,
+        reviews: {
+          include: {
+            user: {select: {username: true}},
+            reviewScores: {
+              include: {
+                criteria: true,
+              },
+            },
+          }
+        }
       },
     });
 
