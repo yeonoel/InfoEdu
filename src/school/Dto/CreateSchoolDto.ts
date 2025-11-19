@@ -1,30 +1,22 @@
 import { IsString, IsOptional, IsArray, ValidateNested } from "class-validator";
 import { Type } from "class-transformer";
 import { CreateFiliereDto } from "./CreateFiliereDto";
+import { CreateImagesDto } from "./CreateImagesDto";
 
 export class CreateSchoolDto {
   @IsString()
   name: string;
-
   @IsOptional()
   @IsString()
   type?: string;
-
-  @IsOptional()
   @IsString()
-  commune?: string;
-
-  @IsOptional()
+  commune: string;
   @IsString()
-  stateSupport?: string;
-
-  @IsOptional()
+  stateSupport: string;
   @IsString()
-  priceLevel?: string;
-
-  @IsOptional()
+  priceLevel: string;
   @IsString()
-  logo?: string;
+  logo: string;
 
   @IsOptional()
   @IsString()
@@ -33,6 +25,13 @@ export class CreateSchoolDto {
   @IsOptional()
   @IsString()
   latitude?: string;
+
+  // Relation : creation des url des images
+  @IsOptional()
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => CreateImagesDto)
+  images?: CreateImagesDto[];
 
   // ✅ Relation : création de filières en même temps
   @IsOptional()

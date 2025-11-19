@@ -38,6 +38,7 @@ model Schools {
   updatedAt    DateTime   @updatedAt
   filieres     Filieres[]
   reviews      Reviews[]
+  images       Images[]
 }
 
 model Filieres {
@@ -81,4 +82,11 @@ model ReviewScores {
   updatedAt  DateTime  @updatedAt
 
   @@unique([reviewId, criteriaId])
+}
+
+model Images {
+  id       Int     @id @default(autoincrement())
+  url      String
+  schools  Schools @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  schoolId Int
 }

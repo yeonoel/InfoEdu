@@ -1,6 +1,7 @@
-import { Body, Controller, Delete, Get, Param, Post } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Param, Post, Query } from "@nestjs/common";
 import { SchoolService } from "./school.service";
 import { CreateSchoolDto } from "./Dto/CreateSchoolDto";
+import { SearchSchoolsDto } from "./Dto/SearchSchoolDto";
 
 @Controller("school")
 export class SchoolController {
@@ -26,6 +27,11 @@ export class SchoolController {
   @Delete("delete-universite/:id")
   remove(@Param("id") id: number) {
     return this.schoolService.remove(+id);
+  }
+
+  @Get('search')
+  async searchSchools(@Query() items: SearchSchoolsDto) {
+    return this.schoolService.searchSchools(items);
   }
 
   /* @Put("update-universite/:id")

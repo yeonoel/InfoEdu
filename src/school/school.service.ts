@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from "@nestjs/common";
 import { CreateSchoolDto } from "./Dto/CreateSchoolDto";
 import { PrismaService } from "src/prisma/prisma.service";
 import { create } from "domain";
+import { SearchSchoolsDto } from "./Dto/SearchSchoolDto";
 
 @Injectable()
 export class SchoolService {
@@ -10,14 +11,21 @@ export class SchoolService {
   async createMany(createSchoolDto: CreateSchoolDto[]) {
     return this.prismaService.$transaction(
       createSchoolDto.map((school) => {
-        const { filieres, ...schoolData } = school;
+        const { filieres, images, ...schoolData  } = school;
         return this.prismaService.schools.create({
           data: {
             ...schoolData,
+            images: {
+              create: images?.map((image) => ({ url: image.url })) || [],
+            },
             filieres: {
               create: filieres?.map((filiere) => ({ name: filiere.name })) || [],
             },
           },
+          include: {
+            filieres: true,
+            images: true
+          }
         });
       })
     )
@@ -46,6 +54,7 @@ export class SchoolService {
       where: { id },
       include: {
         filieres: true,
+        images: true,
         reviews: {
           include: {
             user: {select: {username: true}},
@@ -71,6 +80,68 @@ export class SchoolService {
       where: { id },
     });
     return { message: "Université supprimée avec succès" };
+  }
+
+
+   async searchSchools(filters: SearchSchoolsDto) {
+    const { filiere, commune, query } = filters;
+
+    // Construction dynamique du where clause
+    const where: any = {};
+
+    // Filtre par commune
+    if (commune) {
+      where.commune = {
+        contains: commune
+      };
+    }
+
+    // Filtre par filière (relation)
+    if (filiere) {
+      where.filieres = {
+        some: {
+          name: {
+            contains: filiere
+          },
+        },
+      };
+    }
+
+    if (query) {
+      where.OR = [
+        { name: { contains: query } },
+        { commune: { contains: query } },
+      ];
+    }
+
+    // Requête Prisma
+    const schools = await this.prismaService.schools.findMany({
+      where,
+      take: 50,
+      include: {
+        filieres: true,
+        reviews: {
+          include: {
+            reviewScores: {
+              include: {
+                criteria: true,
+              },
+            },
+            user: {
+              select: {
+                id: true,
+                username: true,
+              },
+            },
+          },
+        },
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
+
+    return schools;
   }
 
   /*async update(id: number, updateSchoolDto: CreateSchoolDto) {

@@ -1,0 +1,4 @@
+-- AlterTable
+ALTER TABLE `schools` ADD COLUMN `ulrImage1` VARCHAR(191) NULL,
+    ADD COLUMN `ulrImage2` VARCHAR(191) NULL,
+    ADD COLUMN `ulrImage3` VARCHAR(191) NULL;
