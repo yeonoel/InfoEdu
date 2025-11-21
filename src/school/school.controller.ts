@@ -13,7 +13,6 @@ export class SchoolController {
   }
 
   
-
   @Get("all-university")
   findAll() {
     return this.schoolService.findAll();
