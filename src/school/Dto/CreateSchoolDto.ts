@@ -14,6 +14,8 @@ export class CreateSchoolDto {
   @IsString()
   stateSupport: string;
   @IsString()
+  category: string;
+  @IsString()
   priceLevel: string;
   @IsString()
   logo: string;

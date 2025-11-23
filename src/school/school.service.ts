@@ -109,7 +109,8 @@ export class SchoolService {
 
     if (query) {
       where.OR = [
-        { name: { contains: query } },
+        { name: { contains: query,  } },
+        { category: { contains: query } },
         { commune: { contains: query } },
       ];
     }

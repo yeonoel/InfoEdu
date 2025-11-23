@@ -31,6 +31,7 @@ model Schools {
   commune      String? // Cocody, Yopougon, etc.
   stateSupport String? // Oui / Non / Je ne sais pas
   priceLevel   String? // Abordable / Moyenne / Trop chère
+  category     String? // 🆕 Informatique / Communication / Digital / Ingénierie / Commerce / etc.
   logo         String?
   longitude    String?
   latitude     String?
