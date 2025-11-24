@@ -5,17 +5,29 @@ import { ValidationPipe } from "@nestjs/common";
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
+  const port = process.env.PORT || 3000;
+
+  console.log('==========================================');
+  console.log('🚀 NestJS API Started');
+  console.log('📍 Environment:', process.env.NODE_ENV || 'development');
+  console.log('🌐 Port:', port);
+  console.log('==========================================');
+
+  // CORS pour permettre à React (sur Vercel) d'appeler l'API
   app.enableCors({
-    origin: '*', // Ou ton URL Vercel spécifique
+    origin: '*', // On va le restreindre après le premier déploiement
     credentials: true,
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
   });
 
+  // Validation globale
   app.useGlobalPipes(new ValidationPipe());
+
+  // Toutes les routes commencent par /api
   app.setGlobalPrefix('api');
 
-  const port = process.env.PORT || 3000;
   await app.listen(port);
-  console.log(`🚀 API running on port ${port}`);
+  console.log(`✅ API listening on http://localhost:${port}/api`);
 }
 
 bootstrap();
