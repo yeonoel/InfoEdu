@@ -7,6 +7,7 @@ import { SchoolModule } from "./school/school.module";
 import { ReviewModule } from "./review/review.module";
 import { CriteriaController } from "./criteria/criteria.controller";
 import { CriteriaModule } from "./criteria/criteria.module";
+import { HealthModule } from './health/health.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { CriteriaModule } from "./criteria/criteria.module";
     SchoolModule,
     ReviewModule,
     CriteriaModule,
+    HealthModule,
   ],
 })
 export class AppModule {}
