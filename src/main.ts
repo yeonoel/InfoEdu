@@ -15,9 +15,9 @@ async function bootstrap() {
 
   // CORS pour permettre à React (sur Vercel) d'appeler l'API
   app.enableCors({
-    origin: '*', // On va le restreindre après le premier déploiement
+    origin: 'https://front-university-4iiw.vercel.app/', // On va le restreindre après le premier déploiement
     credentials: true,
-    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
+    methods: 'GET,PUT,POST,DELETE',
   });
 
   // Validation globale
