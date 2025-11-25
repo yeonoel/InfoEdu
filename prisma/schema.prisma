@@ -1,15 +1,9 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "mysql"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
@@ -27,46 +21,46 @@ model Users {
 model Schools {
   id           Int        @id @default(autoincrement())
   name         String
-  type         String? // privée / publique / semi-publique
-  commune      String? // Cocody, Yopougon, etc.
-  stateSupport String? // Oui / Non / Je ne sais pas
-  priceLevel   String? // Abordable / Moyenne / Trop chère
-  category     String? // 🆕 Informatique / Communication / Digital / Ingénierie / Commerce / etc.
+  type         String?
+  commune      String?
+  stateSupport String?
+  priceLevel   String?
+  category     String?
   logo         String?
   longitude    String?
   latitude     String?
   createdAt    DateTime   @default(now())
   updatedAt    DateTime   @updatedAt
   filieres     Filieres[]
-  reviews      Reviews[]
   images       Images[]
+  reviews      Reviews[]
 }
 
 model Filieres {
   id        Int      @id @default(autoincrement())
-  name      String // Exemple : Informatique, Management
-  school    Schools  @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  name      String
   schoolId  Int
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  school    Schools  @relation(fields: [schoolId], references: [id], onDelete: Cascade)
 }
 
 model Reviews {
   id           Int            @id @default(autoincrement())
-  user         Users          @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId       Int
-  school       Schools        @relation(fields: [schoolId], references: [id], onDelete: Cascade)
   schoolId     Int
-  comment      String?        @db.Text
+  comment      String?
   createdAt    DateTime       @default(now())
   updatedAt    DateTime       @updatedAt
   reviewScores ReviewScores[]
+  school       Schools        @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  user         Users          @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Criterias {
   id           Int            @id @default(autoincrement())
-  label        String // Exemple : "Cours théoriques", "Cours pratiques", "Cadre étudiant", "Frais"
-  icon         String? // optionnel pour UI
+  label        String
+  icon         String?
   createdAt    DateTime       @default(now())
   updatedAt    DateTime       @updatedAt
   reviewScores ReviewScores[]
@@ -74,13 +68,13 @@ model Criterias {
 
 model ReviewScores {
   id         Int       @id @default(autoincrement())
-  review     Reviews   @relation(fields: [reviewId], references: [id], onDelete: Cascade)
   reviewId   Int
-  criteria   Criterias @relation(fields: [criteriaId], references: [id], onDelete: Cascade)
   criteriaId Int
-  value      String // "Très bien" / "Bien" / "Moyen" / "Mauvais"
+  value      String
   createdAt  DateTime  @default(now())
   updatedAt  DateTime  @updatedAt
+  criteria   Criterias @relation(fields: [criteriaId], references: [id], onDelete: Cascade)
+  review     Reviews   @relation(fields: [reviewId], references: [id], onDelete: Cascade)
 
   @@unique([reviewId, criteriaId])
 }
@@ -88,6 +82,6 @@ model ReviewScores {
 model Images {
   id       Int     @id @default(autoincrement())
   url      String
-  schools  Schools @relation(fields: [schoolId], references: [id], onDelete: Cascade)
   schoolId Int
+  schools  Schools @relation(fields: [schoolId], references: [id], onDelete: Cascade)
 }
