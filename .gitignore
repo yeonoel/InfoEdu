@@ -4,6 +4,7 @@
 /build
 dist/
 .env
+.env.production
 
 # Logs
 logs
