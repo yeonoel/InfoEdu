@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
 import { CreateSchoolDto } from "./Dto/CreateSchoolDto";
-import { PrismaService } from "src/prisma/prisma.service";
+import { PrismaService } from "../prisma/prisma.service";
 import { create } from "domain";
 import { SearchSchoolsDto } from "./Dto/SearchSchoolDto";
 
@@ -82,86 +82,83 @@ export class SchoolService {
     return { message: "Université supprimée avec succès" };
   }
 
-
    async searchSchools(filters: SearchSchoolsDto) {
-    const { filiere, commune, query } = filters;
+  const { filiere, commune, query } = filters;
 
-    // Construction dynamique du where clause
-    const where: any = {};
+  const where: any = {};
 
-    // Filtre par commune
-    if (commune) {
-      where.commune = {
-        contains: commune
-      };
-    }
-
-    // Filtre par filière (relation)
-    if (filiere) {
-      where.filieres = {
-        some: {
-          name: {
-            contains: filiere
-          },
-        },
-      };
-    }
-
-    if (query) {
-      where.OR = [
-        { name: { contains: query,  } },
-        { category: { contains: query } },
-        { commune: { contains: query } },
-      ];
-    }
-
-    // Requête Prisma
-    const schools = await this.prismaService.schools.findMany({
-      where,
-      take: 50,
-      include: {
-        filieres: true,
-        reviews: {
-          include: {
-            reviewScores: {
-              include: {
-                criteria: true,
-              },
-            },
-            user: {
-              select: {
-                id: true,
-                username: true,
-              },
-            },
-          },
-        },
-      },
-      orderBy: {
-        createdAt: 'desc',
-      },
-    });
-
-    return schools;
+  // Filtre par commune (insensible à la casse)
+  if (commune) {
+    where.commune = {
+      contains: commune,
+      mode: 'insensitive',
+    };
   }
 
-  /*async update(id: number, updateSchoolDto: CreateSchoolDto) {
-    const { filieres, ...schoolData } = updateSchoolDto;
-    const school = await this.prismaService.school.findUnique({
-      where: { id },
-    });
-    if (!school) throw new NotFoundException("Université non trouvée");
-    await this.prismaService.school.update({
-      where: { id },
-      data: { 
-        ...schoolData,
-        filieres: filieres ? {
-            create: filieres.map((f) => ({
-                name: f.name,
-            }))
-        } : undefined,
-      }
-    });
-    return { message: "Université modifiée avec succès" };
-  }*/
+  // Filtre par filière (insensible à la casse)
+  if (filiere) {
+    where.filieres = {
+      some: {
+        name: {
+          contains: filiere,
+          mode: 'insensitive',
+        },
+      },
+    };
+  }
+
+  // Recherche générale (insensible à la casse)
+  if (query) {
+    where.OR = [
+      { 
+        name: { 
+          contains: query,
+          mode: 'insensitive',
+        } 
+      },
+      { 
+        category: { 
+          contains: query,
+          mode: 'insensitive',
+        } 
+      },
+      { 
+        commune: { 
+          contains: query,
+          mode: 'insensitive',
+        } 
+      },
+    ];
+  }
+
+  // Requête Prisma
+  const schools = await this.prismaService.schools.findMany({
+    where,
+    take: 50,
+    include: {
+      filieres: true,
+      reviews: {
+        include: {
+          reviewScores: {
+            include: {
+              criteria: true,
+            },
+          },
+          user: {
+            select: {
+              id: true,
+              username: true,
+            },
+          },
+        },
+      },
+    },
+    orderBy: {
+      createdAt: 'desc',
+    },
+  });
+
+  return schools;
+}
+
 }
