@@ -1,7 +1,6 @@
-import { Injectable, NotFoundException } from "@nestjs/common";
+import { BadRequestException, Injectable, NotFoundException } from "@nestjs/common";
 import { CreateReviewDto } from "./Dto/createReviewDto";
 import { PrismaService } from "../prisma/prisma.service";
-import { connect } from "http2";
 
 @Injectable()
 export class ReviewService {
@@ -16,6 +15,17 @@ export class ReviewService {
     const school = await this.prismaService.schools.findUnique({
       where: { id: schoolId },
     });
+    const existingReview = await this.prismaService.reviews.findFirst({
+      where: {
+        userId,
+        schoolId,
+      },
+    });
+    
+    if (existingReview) {
+      throw new BadRequestException("Vous avez déjà donné un avis pour cette école");
+    }
+
     if (!school) throw new NotFoundException("Aucune université trouvée");
     const review = await this.prismaService.reviews.create({
       data: {
