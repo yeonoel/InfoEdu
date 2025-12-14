@@ -329,7 +329,7 @@ Content-Type: application/json
 {
   "email": "user@example.com",
   "password": "SecurePass123!",
-  "usernam": "John",
+  "username": "John",
   "role": "user"
 }
 
